@@ -1,15 +1,14 @@
 {
-  "name": "validator",
+  "name": "common",
   "module": "index.ts",
   "type": "module",
-  "private": true,
+  "exports": {
+    "./types": "./index.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "peerDependencies": {
-    "typescript": "^5"
-  },
-  "dependencies": {
-    "common-types": "^1.33.2"
+    "typescript": "^5.0.0"
   }
 }
