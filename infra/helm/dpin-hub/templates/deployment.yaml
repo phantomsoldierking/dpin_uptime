@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpin-hub
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: dpin-hub
+  template:
+    metadata:
+      labels:
+        app: dpin-hub
+    spec:
+      containers:
+        - name: hub
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: NODE_ENV
+              value: {{ .Values.env.NODE_ENV | quote }}
+            - name: SCHEDULER_INTERVAL_MS
+              value: {{ .Values.env.SCHEDULER_INTERVAL_MS | quote }}
+            - name: STALE_JOB_TIMEOUT_MS
+              value: {{ .Values.env.STALE_JOB_TIMEOUT_MS | quote }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: dpin-api-secrets
+                  key: DATABASE_URL

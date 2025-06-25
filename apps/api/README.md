@@ -1,15 +1,19 @@
-# api
+# API
 
-To install dependencies:
+Express control plane implementing:
+- auth
+- website CRUD
+- node registration/heartbeat
+- job polling
+- signed result ingestion
+- alerts + incidents
+- analytics
+- health + metrics
+
+Run:
 
 ```bash
-bun install
+bun run dev
 ```
 
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.5. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+Port: `3001` by default.

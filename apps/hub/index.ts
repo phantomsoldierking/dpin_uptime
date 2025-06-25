@@ -1,158 +1,191 @@
-import { randomUUIDv7, type ServerWebSocket } from "bun";
-import type { IncomingMessage, SignupIncomingMessage } from "common/types";
 import { prismaClient } from "db/client";
-import { PublicKey } from "@solana/web3.js";
-import nacl from "tweetnacl";
-import nacl_util from "tweetnacl-util";
 
-const availableValidators: { validatorId: string, socket: ServerWebSocket<unknown>, publicKey: string }[] = [];
+const schedulerIntervalMs = Number(process.env.SCHEDULER_INTERVAL_MS ?? 10_000);
+const staleJobTimeoutMs = Number(process.env.STALE_JOB_TIMEOUT_MS ?? 120_000);
 
-const CALLBACKS : { [callbackId: string]: (data: IncomingMessage) => void } = {}
-const COST_PER_VALIDATION = 100; // in lamports
+let running = false;
+let aggregatingSLA = false;
 
-Bun.serve({
-    fetch(req, server) {
-      if (server.upgrade(req)) {
-        return;
+async function scheduleDueJobs(): Promise<void> {
+  if (running) {
+    return;
+  }
+
+  running = true;
+  try {
+    const now = new Date();
+
+    const websites = await prismaClient.website.findMany({
+      where: { isActive: true },
+      include: {
+        regionConfigs: {
+          where: { isEnabled: true },
+        },
+      },
+      orderBy: { createdAt: "asc" },
+    });
+
+    for (const website of websites) {
+      const lastJob = await prismaClient.job.findFirst({
+        where: { websiteId: website.id },
+        orderBy: { scheduledAt: "desc" },
+        select: { scheduledAt: true },
+      });
+
+      const due = !lastJob || now.getTime() - lastJob.scheduledAt.getTime() >= website.intervalSeconds * 1000;
+      if (!due) {
+        continue;
       }
-      return new Response("Upgrade failed", { status: 500 });
-    },
-    port: 8081,
-    websocket: {
-        async message(ws: ServerWebSocket<unknown>, message: string) {
-            const data: IncomingMessage = JSON.parse(message);
-            
-            if (data.type === 'signup') {
 
-                const verified = await verifyMessage(
-                    `Signed message for ${data.data.callbackId}, ${data.data.publicKey}`,
-                    data.data.publicKey,
-                    data.data.signedMessage
-                );
-                if (verified) {
-                    await signupHandler(ws, data.data);
-                }
-            } else if (data.type === 'validate') {
-                CALLBACKS[data.data.callbackId](data);
-                delete CALLBACKS[data.data.callbackId];
-            }
-        },
-        async close(ws: ServerWebSocket<unknown>) {
-            availableValidators.splice(availableValidators.findIndex(v => v.socket === ws), 1);
-        }
-    },
-});
+      for (const regionConfig of website.regionConfigs) {
+        await prismaClient.job.create({
+          data: {
+            websiteId: website.id,
+            region: regionConfig.region,
+            status: "PENDING",
+            scheduledAt: now,
+          },
+        });
+      }
 
-async function signupHandler(ws: ServerWebSocket<unknown>, { ip, publicKey, signedMessage, callbackId }: SignupIncomingMessage) {
-    const validatorDb = await prismaClient.validator.findFirst({
-        where: {
-            publicKey,
-        },
+      console.log(
+        `[hub] scheduled website=${website.slug} regions=${website.regionConfigs.map((item) => item.region).join(",")}`,
+      );
+    }
+
+    const staleThreshold = new Date(Date.now() - staleJobTimeoutMs);
+    const staleJobs = await prismaClient.job.findMany({
+      where: {
+        status: { in: ["PENDING", "ASSIGNED", "IN_PROGRESS"] },
+        scheduledAt: { lt: staleThreshold },
+      },
+      select: { id: true },
+      take: 500,
     });
 
-    if (validatorDb) {
-        ws.send(JSON.stringify({
-            type: 'signup',
-            data: {
-                validatorId: validatorDb.id,
-                callbackId,
+    if (staleJobs.length > 0) {
+      await prismaClient.job.updateMany({
+        where: { id: { in: staleJobs.map((job) => job.id) } },
+        data: { status: "TIMED_OUT", completedAt: new Date() },
+      });
+      console.log(`[hub] timed out ${staleJobs.length} stale jobs`);
+    }
+  } catch (error) {
+    console.error("[hub] scheduler tick failed", error);
+  } finally {
+    running = false;
+  }
+}
+
+async function printHeartbeat(): Promise<void> {
+  const [pending, assigned, inProgress, completed] = await Promise.all([
+    prismaClient.job.count({ where: { status: "PENDING" } }),
+    prismaClient.job.count({ where: { status: "ASSIGNED" } }),
+    prismaClient.job.count({ where: { status: "IN_PROGRESS" } }),
+    prismaClient.job.count({ where: { status: "COMPLETED" } }),
+  ]);
+
+  console.log(`[hub] queue snapshot pending=${pending} assigned=${assigned} inProgress=${inProgress} completed=${completed}`);
+}
+
+async function aggregateDailySLARecords(): Promise<void> {
+  if (aggregatingSLA) {
+    return;
+  }
+
+  aggregatingSLA = true;
+  try {
+    const websites = await prismaClient.website.findMany({
+      where: { isActive: true },
+      include: { regionConfigs: { where: { isEnabled: true } } },
+    });
+
+    const dayStart = new Date();
+    dayStart.setUTCHours(0, 0, 0, 0);
+
+    for (const website of websites) {
+      for (const regionConfig of website.regionConfigs) {
+        const results = await prismaClient.result.findMany({
+          where: {
+            websiteId: website.id,
+            region: regionConfig.region,
+            timestamp: { gte: dayStart },
+          },
+          select: { status: true, responseTimeMs: true },
+        });
+
+        const totalChecks = results.length;
+        const failedChecks = results.filter((item) => item.status !== "UP").length;
+        const upChecks = totalChecks - failedChecks;
+        const uptimePercent = totalChecks === 0 ? 100 : Number(((upChecks / totalChecks) * 100).toFixed(4));
+        const responseTimes = results
+          .map((item) => item.responseTimeMs)
+          .filter((item): item is number => typeof item === "number" && item > 0)
+          .sort((a, b) => a - b);
+
+        const avgResponseMs =
+          responseTimes.length === 0
+            ? null
+            : responseTimes.reduce((sum, value) => sum + value, 0) / responseTimes.length;
+        const p95Index = responseTimes.length === 0 ? -1 : Math.floor(responseTimes.length * 0.95) - 1;
+        const p95ResponseMs = p95Index >= 0 ? responseTimes[Math.max(0, p95Index)] : null;
+
+        await prismaClient.slaRecord.upsert({
+          where: {
+            websiteId_region_date: {
+              websiteId: website.id,
+              region: regionConfig.region,
+              date: dayStart,
             },
-        }));
-
-        availableValidators.push({
-            validatorId: validatorDb.id,
-            socket: ws,
-            publicKey: validatorDb.publicKey,
+          },
+          update: {
+            uptimePercent,
+            avgResponseMs,
+            p95ResponseMs,
+            totalChecks,
+            failedChecks,
+          },
+          create: {
+            websiteId: website.id,
+            region: regionConfig.region,
+            date: dayStart,
+            uptimePercent,
+            avgResponseMs,
+            p95ResponseMs,
+            totalChecks,
+            failedChecks,
+          },
         });
-        return;
+      }
     }
-    
-    //TODO: Given the ip, return the location
-    const validator = await prismaClient.validator.create({
-        data: {
-            ip,
-            publicKey,
-            location: 'unknown',
-        },
-    });
 
-    ws.send(JSON.stringify({
-        type: 'signup',
-        data: {
-            validatorId: validator.id,
-            callbackId,
-        },
-    }));
-
-    availableValidators.push({
-        validatorId: validator.id,
-        socket: ws,
-        publicKey: validator.publicKey,
-    });
+    console.log("[hub] SLA aggregation updated");
+  } catch (error) {
+    console.error("[hub] SLA aggregation failed", error);
+  } finally {
+    aggregatingSLA = false;
+  }
 }
 
-async function verifyMessage(message: string, publicKey: string, signature: string) {
-    const messageBytes = nacl_util.decodeUTF8(message);
-    const result = nacl.sign.detached.verify(
-        messageBytes,
-        new Uint8Array(JSON.parse(signature)),
-        new PublicKey(publicKey).toBytes(),
-    );
+async function main(): Promise<void> {
+  console.log(`[hub] scheduler starting (tick=${schedulerIntervalMs}ms)`);
 
-    return result;
+  await scheduleDueJobs();
+
+  setInterval(() => {
+    void scheduleDueJobs();
+  }, schedulerIntervalMs);
+
+  setInterval(() => {
+    void printHeartbeat();
+  }, 30_000);
+
+  setInterval(() => {
+    void aggregateDailySLARecords();
+  }, 300_000);
 }
 
-setInterval(async () => {
-    const websitesToMonitor = await prismaClient.website.findMany({
-        where: {
-            disabled: false,
-        },
-    });
-
-    for (const website of websitesToMonitor) {
-        availableValidators.forEach(validator => {
-            const callbackId = randomUUIDv7();
-            console.log(`Sending validate to ${validator.validatorId} ${website.url}`);
-            validator.socket.send(JSON.stringify({
-                type: 'validate',
-                data: {
-                    url: website.url,
-                    callbackId
-                },
-            }));
-
-            CALLBACKS[callbackId] = async (data: IncomingMessage) => {
-                if (data.type === 'validate') {
-                    const { validatorId, status, latency, signedMessage } = data.data;
-                    const verified = await verifyMessage(
-                        `Replying to ${callbackId}`,
-                        validator.publicKey,
-                        signedMessage
-                    );
-                    if (!verified) {
-                        return;
-                    }
-
-                    await prismaClient.$transaction(async (tx) => {
-                        await tx.websiteTick.create({
-                            data: {
-                                websiteId: website.id,
-                                validatorId,
-                                status,
-                                latency,
-                                createdAt: new Date(),
-                            },
-                        });
-
-                        await tx.validator.update({
-                            where: { id: validatorId },
-                            data: {
-                                pendingPayouts: { increment: COST_PER_VALIDATION },
-                            },
-                        });
-                    });
-                }
-            };
-        });
-    }
-}, 60 * 1000);
+main().catch((error) => {
+  console.error("[hub] fatal", error);
+  process.exit(1);
+});

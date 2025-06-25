@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: dpin-validator
+spec:
+  selector:
+    matchLabels:
+      app: dpin-validator
+  template:
+    metadata:
+      labels:
+        app: dpin-validator
+    spec:
+      serviceAccountName: dpin-validator
+      containers:
+        - name: validator
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: HUB_API_URL
+              value: {{ .Values.env.HUB_API_URL | quote }}
+            - name: NODE_REGION
+              value: {{ .Values.region | quote }}
+            - name: NODE_ID
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+            - name: NODE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: dpin-validator-secrets
+                  key: NODE_API_KEY
+            - name: NODE_HMAC_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: dpin-validator-secrets
+                  key: NODE_HMAC_SECRET
+            - name: POLL_INTERVAL_SECONDS
+              value: {{ .Values.env.POLL_INTERVAL_SECONDS | quote }}
+            - name: HEARTBEAT_INTERVAL_SECONDS
+              value: {{ .Values.env.HEARTBEAT_INTERVAL_SECONDS | quote }}
+          resources:
+{{ toYaml .Values.resources | indent 12 }}

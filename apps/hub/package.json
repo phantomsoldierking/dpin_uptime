@@ -3,6 +3,14 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "dev": "bun run index.ts",
+    "start": "bun run index.ts",
+    "check-types": "tsc --noEmit"
+  },
+  "dependencies": {
+    "db": "*"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },

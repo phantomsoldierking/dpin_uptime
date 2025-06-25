@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -13,40 +7,239 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserRole {
+  ADMIN
+  NODE
+  SUPER
+}
+
+enum CheckType {
+  HTTP
+  HTTPS
+  TCP
+  ICMP
+}
+
+enum JobStatus {
+  PENDING
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  TIMED_OUT
+}
+
+enum SiteStatus {
+  UP
+  DOWN
+  DEGRADED
+  UNKNOWN
+}
+
+enum AlertType {
+  DOWNTIME
+  LATENCY_SPIKE
+  REGION_FAILURE
+  SLA_BREACH
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
 model User {
-  id    String @id @default(uuid())
-  email String
+  id            String        @id @default(cuid())
+  email         String        @unique
+  passwordHash  String
+  name          String?
+  role          UserRole      @default(ADMIN)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  websites      Website[]
+  alertConfigs  AlertConfig[]
+
+  @@map("users")
 }
 
 model Website {
-  id       String        @id @default(uuid())
-  url      String
-  userId   String
-  ticks    WebsiteTick[]
-  disabled Boolean       @default(false)
+  id              String         @id @default(cuid())
+  userId          String
+  name            String
+  url             String
+  slug            String         @unique
+  checkType       CheckType      @default(HTTP)
+  intervalSeconds Int            @default(60)
+  timeoutSeconds  Int            @default(10)
+  expectedStatus  Int            @default(200)
+  expectedBody    String?
+  isActive        Boolean        @default(true)
+  isPublic        Boolean        @default(false)
+  stressConfig    Json?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+
+  user            User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  regionConfigs   WebsiteRegion[]
+  jobs            Job[]
+  results         Result[]
+  alerts          AlertConfig[]
+  slaRecords      SlaRecord[]
+  incidents       Incident[]
+
+  @@index([userId])
+  @@index([isActive])
+  @@map("websites")
 }
 
-model Validator {
-  id             String        @id @default(uuid())
-  publicKey      String
-  location       String
-  ip             String
-  pendingPayouts Int           @default(0)
-  ticks          WebsiteTick[]
+model WebsiteRegion {
+  id         String   @id @default(cuid())
+  websiteId  String
+  region     String
+  minNodes   Int      @default(1)
+  isEnabled  Boolean  @default(true)
+
+  website    Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, region])
+  @@map("website_regions")
 }
 
-model WebsiteTick {
-  id          String        @id @default(uuid())
-  websiteId   String
-  validatorId String
-  createdAt   DateTime
-  status      WebsiteStatus
-  latency     Float
-  website     Website       @relation(fields: [websiteId], references: [id])
-  validator   Validator     @relation(fields: [validatorId], references: [id])
+model Node {
+  id            String          @id
+  name          String
+  region        String
+  publicKey     String
+  apiKey        String          @unique
+  isActive      Boolean         @default(true)
+  lastHeartbeat DateTime?
+  latitude      Float?
+  longitude     Float?
+  metadata      Json?
+  createdAt     DateTime        @default(now())
+
+  results       Result[]
+  reputation    NodeReputation?
+
+  @@index([region, isActive])
+  @@map("nodes")
 }
 
-enum WebsiteStatus {
-  Good
-  Bad
+model NodeReputation {
+  id              String   @id @default(cuid())
+  nodeId          String   @unique
+  score           Float    @default(100.0)
+  totalChecks     Int      @default(0)
+  successChecks   Int      @default(0)
+  falseReports    Int      @default(0)
+  lastPenalizedAt DateTime?
+  updatedAt       DateTime @updatedAt
+
+  node            Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+
+  @@map("node_reputations")
+}
+
+model Job {
+  id              String     @id @default(cuid())
+  websiteId       String
+  region          String
+  status          JobStatus  @default(PENDING)
+  scheduledAt     DateTime
+  assignedNodeIds String[]   @default([])
+  createdAt       DateTime   @default(now())
+  completedAt     DateTime?
+
+  website         Website    @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  results         Result[]
+
+  @@index([websiteId, region])
+  @@index([status, scheduledAt])
+  @@map("jobs")
+}
+
+model Result {
+  id              String      @id @default(cuid())
+  jobId           String
+  nodeId          String
+  websiteId       String
+  region          String
+  status          SiteStatus  @default(UNKNOWN)
+  statusCode      Int?
+  responseTimeMs  Int?
+  dnsTimeMs       Int?
+  tcpTimeMs       Int?
+  tlsTimeMs       Int?
+  ttfbMs          Int?
+  errorMessage    String?
+  signature       String
+  isConsensus     Boolean     @default(false)
+  timestamp       DateTime
+  createdAt       DateTime    @default(now())
+
+  job             Job         @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  node            Node        @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  website         Website     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId, timestamp])
+  @@index([jobId])
+  @@index([nodeId, timestamp])
+  @@unique([jobId, nodeId])
+  @@map("results")
+}
+
+model SlaRecord {
+  id            String   @id @default(cuid())
+  websiteId     String
+  region        String
+  date          DateTime
+  uptimePercent Float
+  avgResponseMs Float?
+  p95ResponseMs Float?
+  totalChecks   Int
+  failedChecks  Int
+  mttrSeconds   Float?
+  mtbfSeconds   Float?
+
+  website       Website  @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@unique([websiteId, region, date])
+  @@map("sla_records")
+}
+
+model AlertConfig {
+  id         String      @id @default(cuid())
+  websiteId  String
+  userId     String
+  type       AlertType
+  threshold  Json
+  channels   Json
+  isEnabled  Boolean     @default(true)
+  createdAt  DateTime    @default(now())
+
+  website    Website     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  incidents  Incident[]
+
+  @@map("alert_configs")
+}
+
+model Incident {
+  id             String      @id @default(cuid())
+  alertConfigId  String
+  websiteId      String
+  startedAt      DateTime
+  resolvedAt     DateTime?
+  severity       Severity    @default(MEDIUM)
+  summary        String
+  notifiedAt     DateTime?
+
+  alertConfig    AlertConfig @relation(fields: [alertConfigId], references: [id], onDelete: Cascade)
+  website        Website     @relation(fields: [websiteId], references: [id], onDelete: Cascade)
+
+  @@index([websiteId])
+  @@map("incidents")
 }

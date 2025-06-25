@@ -1,0 +1,13 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: dpin-api
+  namespace: dpin
+spec:
+  selector:
+    matchLabels:
+      app: dpin-api
+  endpoints:
+    - path: /metrics
+      port: http
+      interval: 15s

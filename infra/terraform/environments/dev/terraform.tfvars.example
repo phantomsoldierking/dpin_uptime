@@ -1,0 +1,7 @@
+aws_region               = "us-east-1"
+private_subnet_ids       = ["subnet-aaa", "subnet-bbb", "subnet-ccc"]
+rds_username             = "dpin"
+rds_password             = "change-me"
+rds_security_group_ids   = ["sg-rds"]
+redis_security_group_ids = ["sg-redis"]
+health_check_domain      = "api-dev.example.com"

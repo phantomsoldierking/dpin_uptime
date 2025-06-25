@@ -1,6 +1,20 @@
+import type { UserRole } from "common";
 
-declare namespace Express {
+declare global {
+  namespace Express {
     interface Request {
-        userId?: string
+      authUser?: {
+        id: string;
+        email: string;
+        role: UserRole;
+      };
+      nodeAuth?: {
+        id: string;
+        region: string;
+        apiKey: string;
+      };
     }
+  }
 }
+
+export {};

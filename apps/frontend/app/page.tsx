@@ -1,214 +1,64 @@
-"use client"
-import React, { useEffect, useState } from 'react';
-import { Activity, Bell, Clock, Server, ArrowRight, Check, Moon, Sun } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import Link from "next/link";
+import { ArrowRight, Globe, ShieldCheck, Timer } from "lucide-react";
 
-function App() {
-  const [darkMode, setDarkMode] = useState(false);
-  const router = useRouter();
+const features = [
+  {
+    title: "Regional Checks",
+    description: "Run checks from multiple regions to avoid single-point blind spots.",
+    icon: Globe,
+  },
+  {
+    title: "Signed Results",
+    description: "Validator payloads are HMAC-signed and verified at ingestion.",
+    icon: ShieldCheck,
+  },
+  {
+    title: "Low-Latency Loop",
+    description: "Scheduler, API, and validators run as a tight feedback loop locally.",
+    icon: Timer,
+  },
+];
 
-  useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
+export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 dark:text-white transition-colors duration-200">
-      {/* Hero Section */}
-      <section className="container mx-auto px-6 py-16 md:py-24">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div>
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white leading-tight">
-              Monitor Your Services with Confidence
-            </h1>
-            <p className="mt-6 text-xl text-gray-600 dark:text-gray-300">
-              Get instant alerts when your services go down. Monitor uptime, performance, and ensure your business never misses a beat.
-            </p>
-            <div className="mt-8 flex space-x-4">
-              <button onClick={() => router.push('/dashboard')} className="px-6 py-3 bg-indigo-600 dark:bg-indigo-500 text-white rounded-lg hover:bg-indigo-700 dark:hover:bg-indigo-600 transition flex items-center">
-                Start Monitoring
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </button>
-              <button className="px-6 py-3 border border-gray-300 dark:border-gray-600 rounded-lg hover:border-gray-400 dark:hover:border-gray-500 transition dark:text-white">
-                View Demo
-              </button>
-            </div>
-          </div>
-          <div className="relative">
-            <img
-              src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=800&q=80"
-              alt="Dashboard"
-              className="rounded-lg shadow-2xl"
-            />
-          </div>
+    <main className="relative overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_10%_20%,rgba(6,182,212,0.2),transparent_35%),radial-gradient(circle_at_90%_10%,rgba(251,146,60,0.18),transparent_25%)]" />
+      <section className="relative mx-auto max-w-6xl px-4 pb-16 pt-20">
+        <p className="mb-4 inline-flex items-center rounded-full border border-zinc-700 bg-zinc-900/80 px-3 py-1 text-xs uppercase tracking-[0.16em] text-cyan-300">
+          Local MVP Stack
+        </p>
+        <h1 className="max-w-3xl text-4xl font-semibold leading-tight text-zinc-50 md:text-6xl">
+          Distributed uptime monitoring with job scheduling, signed validators, and live analytics.
+        </h1>
+        <p className="mt-6 max-w-2xl text-base text-zinc-300 md:text-lg">
+          Register websites, schedule region-aware checks, ingest validator results, and track uptime from a single control plane.
+        </p>
+
+        <div className="mt-10 flex flex-wrap gap-4">
+          <Link
+            href="/register"
+            className="inline-flex items-center gap-2 rounded-md bg-cyan-400 px-5 py-3 text-sm font-semibold text-zinc-950 hover:bg-cyan-300"
+          >
+            Create Account <ArrowRight className="h-4 w-4" />
+          </Link>
+          <Link
+            href="/login"
+            className="inline-flex items-center rounded-md border border-zinc-700 px-5 py-3 text-sm font-semibold text-zinc-100 hover:border-zinc-500 hover:bg-zinc-900"
+          >
+            Sign In
+          </Link>
         </div>
       </section>
 
-      {/* Features */}
-      <section id="features" className="bg-gray-50 dark:bg-gray-800/50 py-20">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-16">
-            Everything you need for reliable monitoring
-          </h2>
-          <div className="grid md:grid-cols-3 gap-12">
-            <FeatureCard
-              icon={<Bell className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />}
-              title="Instant Alerts"
-              description="Get notified immediately when your services experience downtime through multiple channels."
-            />
-            <FeatureCard
-              icon={<Clock className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />}
-              title="24/7 Monitoring"
-              description="Round-the-clock monitoring from multiple locations worldwide."
-            />
-            <FeatureCard
-              icon={<Server className="h-8 w-8 text-indigo-600 dark:text-indigo-400" />}
-              title="Detailed Reports"
-              description="Comprehensive reports and analytics to track your service performance."
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Pricing */}
-      <section id="pricing" className="py-20">
-        <div className="container mx-auto px-6">
-          <h2 className="text-3xl font-bold text-center text-gray-900 dark:text-white mb-16">
-            Simple, transparent pricing
-          </h2>
-          <div className="grid md:grid-cols-3 gap-8">
-            <PricingCard
-              title="Starter"
-              price="29"
-              features={[
-                "10 monitors",
-                "1-minute checks",
-                "Email notifications",
-                "5 team members",
-                "24h data retention"
-              ]}
-            />
-            <PricingCard
-              title="Professional"
-              price="79"
-              featured={true}
-              features={[
-                "50 monitors",
-                "30-second checks",
-                "All notification channels",
-                "Unlimited team members",
-                "30-day data retention",
-                "API access"
-              ]}
-            />
-            <PricingCard
-              title="Enterprise"
-              price="199"
-              features={[
-                "Unlimited monitors",
-                "15-second checks",
-                "Priority support",
-                "Custom solutions",
-                "90-day data retention",
-                "SLA guarantee"
-              ]}
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-gray-900 text-white py-12">
-        <div className="container mx-auto px-6">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-2">
-                <Activity className="h-6 w-6 text-indigo-400" />
-                <span className="text-xl font-bold">UptimeGuard</span>
-              </div>
-              <p className="mt-4 text-gray-400">
-                Keeping your services online, always.
-              </p>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Product</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Features</a></li>
-                <li><a href="#" className="hover:text-white">Pricing</a></li>
-                <li><a href="#" className="hover:text-white">API</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Company</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">About</a></li>
-                <li><a href="#" className="hover:text-white">Blog</a></li>
-                <li><a href="#" className="hover:text-white">Careers</a></li>
-              </ul>
-            </div>
-            <div>
-              <h3 className="font-semibold mb-4">Legal</h3>
-              <ul className="space-y-2 text-gray-400">
-                <li><a href="#" className="hover:text-white">Privacy</a></li>
-                <li><a href="#" className="hover:text-white">Terms</a></li>
-                <li><a href="#" className="hover:text-white">Security</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400">
-            <p>&copy; 2025 UptimeGuard. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
-//@ts-ignore
-function FeatureCard({ icon, title, description }) {
-  return (
-    <div className="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg">
-      <div className="mb-4">{icon}</div>
-      <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">{title}</h3>
-      <p className="text-gray-600 dark:text-gray-300">{description}</p>
-    </div>
-  );
-}
-
-//@ts-ignore
-function PricingCard({ title, price, features, featured = false }) {
-  return (
-    <div className={`p-8 rounded-lg ${
-      featured
-        ? 'bg-indigo-600 text-white ring-4 ring-indigo-300 dark:ring-indigo-500'
-        : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-white'
-    }`}>
-      <h3 className="text-xl font-semibold mb-4">{title}</h3>
-      <div className="mb-6">
-        <span className="text-4xl font-bold">${price}</span>
-        <span className="text-sm">/month</span>
-      </div>
-      <ul className="space-y-3 mb-8">
-        {features.map((feature: any, index: any) => (
-          <li key={index} className="flex items-center space-x-2">
-            <Check className="h-5 w-5" />
-            <span>{feature}</span>
-          </li>
+      <section className="relative mx-auto grid max-w-6xl gap-4 px-4 pb-20 md:grid-cols-3">
+        {features.map((feature) => (
+          <article key={feature.title} className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-6">
+            <feature.icon className="mb-4 h-6 w-6 text-cyan-300" />
+            <h2 className="mb-2 text-lg font-semibold text-zinc-100">{feature.title}</h2>
+            <p className="text-sm text-zinc-400">{feature.description}</p>
+          </article>
         ))}
-      </ul>
-      <button
-        className={`w-full py-3 rounded-lg transition ${
-          featured
-            ? 'bg-white text-indigo-600 hover:bg-gray-100 dark:hover:bg-gray-200'
-            : 'bg-indigo-600 dark:bg-indigo-500 text-white hover:bg-indigo-700 dark:hover:bg-indigo-600'
-        }`}
-      >
-        Get Started
-      </button>
-    </div>
+      </section>
+    </main>
   );
 }
-
-export default App;

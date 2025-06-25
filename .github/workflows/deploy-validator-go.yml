@@ -1,0 +1,20 @@
+name: Build Validator Go Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/validator-go/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: apps/validator-go
+          file: apps/validator-go/Dockerfile
+          push: false
+          tags: ghcr.io/phantomsoldierking/dpin-validator-go:latest

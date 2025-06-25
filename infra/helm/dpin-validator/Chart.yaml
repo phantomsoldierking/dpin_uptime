@@ -1,0 +1,5 @@
+apiVersion: v2
+name: dpin-validator
+description: Go-based validator daemonset
+version: 0.1.0
+appVersion: "1.0.0"

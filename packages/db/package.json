@@ -3,7 +3,14 @@
   "module": "index.ts",
   "type": "module",
   "exports": {
+    ".": "./src/index.ts",
     "./client": "./src/index.ts"
+  },
+  "scripts": {
+    "db:generate": "prisma generate --schema=prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=prisma/schema.prisma",
+    "db:seed": "bun run prisma/seed.ts",
+    "check-types": "tsc --noEmit"
   },
   "private": true,
   "devDependencies": {

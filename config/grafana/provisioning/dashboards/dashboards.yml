@@ -1,0 +1,10 @@
+apiVersion: 1
+
+providers:
+  - name: dpin-dashboards
+    orgId: 1
+    folder: DPIN
+    type: file
+    disableDeletion: false
+    options:
+      path: /var/lib/grafana/dashboards

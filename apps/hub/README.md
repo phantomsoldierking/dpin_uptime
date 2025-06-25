@@ -1,15 +1,12 @@
-# hub
+# Hub
 
-To install dependencies:
+Scheduler service that:
+- finds due websites
+- creates region-scoped monitoring jobs
+- times out stale jobs
+
+Run:
 
 ```bash
-bun install
+bun run dev
 ```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.5. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

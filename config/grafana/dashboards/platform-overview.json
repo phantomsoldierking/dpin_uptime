@@ -1,0 +1,25 @@
+{
+  "title": "DPIN Platform Overview",
+  "schemaVersion": 39,
+  "version": 1,
+  "panels": [
+    {
+      "type": "timeseries",
+      "title": "Checks By Status",
+      "targets": [
+        {
+          "expr": "sum by (status) (dpin_checks_total)"
+        }
+      ]
+    },
+    {
+      "type": "timeseries",
+      "title": "API Requests",
+      "targets": [
+        {
+          "expr": "sum(dpin_http_requests_total)"
+        }
+      ]
+    }
+  ]
+}

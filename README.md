@@ -1,84 +1,120 @@
-# Turborepo starter
+# DPIN Uptime
 
-This Turborepo starter is maintained by the Turborepo core team.
+Plan-driven implementation of a distributed uptime monitoring platform with:
+- API control plane (`apps/api`)
+- scheduler hub with SLA aggregation (`apps/hub`)
+- validator agents:
+  - TypeScript runtime (`apps/validator`)
+  - Go microservice (`apps/validator-go`)
+- Next.js frontend (`apps/frontend`)
+- Prisma/PostgreSQL data model (`packages/db`)
+- DevOps layer (`infra/*`, `config/*`, `docker-compose*.yml`)
 
-## Using this example
+## Implemented platform features
 
-Run the following command:
+- Auth: `POST /v1/auth/register`, `POST /v1/auth/login`, `POST /v1/auth/refresh`, `GET /v1/auth/me`
+- Websites: create/list/get/update/deactivate + results listing
+- Nodes: register/list/get + heartbeat
+- Jobs: list/get + node polling (`GET /v1/jobs/poll`)
+- Results ingestion: `POST /v1/results` with HMAC signature verification
+- Quorum consensus: majority status marks consensus results and closes/opens incidents
+- Alerts: CRUD + incident creation on downtime consensus
+- Analytics: overview + per-website stats + SLA records (`GET /v1/analytics/sla`)
+- Health and metrics endpoints: `/health`, `/metrics`
+- Hub SLA aggregation writes daily `sla_records`
+- Go validator microservice for Kubernetes DaemonSet deployment
 
-```sh
-npx create-turbo@latest
+## DevOps and production support
+
+- Terraform modules for:
+  - EKS (`infra/terraform/modules/eks`)
+  - RDS PostgreSQL (`infra/terraform/modules/rds`)
+  - ElastiCache Redis (`infra/terraform/modules/elasticache`)
+  - CloudWatch alarms + SNS (`infra/terraform/modules/cloudwatch`)
+  - Route53 health checks (`infra/terraform/modules/route53`)
+- Environment stacks:
+  - `infra/terraform/environments/dev`
+  - `infra/terraform/environments/prod`
+- Helm charts:
+  - `infra/helm/dpin-api`
+  - `infra/helm/dpin-hub`
+  - `infra/helm/dpin-frontend`
+  - `infra/helm/dpin-validator` (DaemonSet)
+- Observability:
+  - Prometheus, Grafana, Loki, Tempo, OTel Collector, Promtail
+  - configs under `config/*`
+- Local full stack orchestration:
+  - `docker-compose.infra.yml`
+  - `docker-compose.yml`
+
+## API endpoint groups
+
+- `/v1/auth/*`
+- `/v1/websites/*`
+- `/v1/nodes/*`
+- `/v1/jobs/*`
+- `/v1/results`
+- `/v1/alerts/*`
+- `/v1/analytics/*`
+
+Compatibility alias is also mounted at `/api/v1/*`.
+
+## Local setup
+
+1. Install dependencies
+
+```bash
+bun install
 ```
 
-## What's inside?
+2. Copy env
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-pnpm build
+```bash
+cp .env.example .env.local
 ```
 
-### Develop
+3. Start PostgreSQL and set `DATABASE_URL`.
 
-To develop all apps and packages, run the following command:
+4. Generate/migrate/seed DB
 
-```
-cd my-turborepo
-pnpm dev
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
-
-```
-cd my-turborepo
-npx turbo login
+```bash
+bun run db:generate
+bun run db:migrate
+bun run db:seed
 ```
 
-This will authenticate the Turborepo CLI with your [Vercel account](https://vercel.com/docs/concepts/personal-accounts/overview).
+5. Run services in separate terminals (Node validator)
 
-Next, you can link your Turborepo to your Remote Cache by running the following command from the root of your Turborepo:
-
+```bash
+bun run dev:api
+bun run dev:hub
+bun run dev:validator
+bun run dev:frontend
 ```
-npx turbo link
+
+Equivalent helper targets are available in `Makefile` (`make dev-api`, `make db-seed`, `make test-e2e`, etc.).
+
+6. Run Go validator microservice
+
+```bash
+bun run dev:validator:go
 ```
 
-## Useful Links
+## Default seeded credentials
 
-Learn more about the power of Turborepo:
+- Admin: `admin@dpin-local.io` / `admin123`
+- Node user: `node@dpin-local.io` / `node123`
 
-- [Tasks](https://turbo.build/repo/docs/core-concepts/monorepos/running-tasks)
-- [Caching](https://turbo.build/repo/docs/core-concepts/caching)
-- [Remote Caching](https://turbo.build/repo/docs/core-concepts/remote-caching)
-- [Filtering](https://turbo.build/repo/docs/core-concepts/monorepos/filtering)
-- [Configuration Options](https://turbo.build/repo/docs/reference/configuration)
-- [CLI Usage](https://turbo.build/repo/docs/reference/command-line-reference)
+## Smoke tests
+
+```bash
+bash scripts/test-check-flow.sh
+bash scripts/test-node-signing.sh
+```
+
+## Notes
+
+- Hub creates jobs based on website intervals and enabled regions.
+- Validator polls jobs, runs checks, signs results, and submits them.
+- API computes quorum-style majority consensus and opens/closes incidents from alert configs.
+- SLA records are computed by hub and available to frontend through `/v1/analytics/sla`.

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: dpin-hub
+description: DPIN scheduler hub
+version: 0.1.0
+appVersion: "1.0.0"

@@ -1,15 +1,11 @@
 # db
 
-To install dependencies:
+Prisma schema and client for DPIN Uptime.
+
+Commands:
 
 ```bash
-bun install
+bun run db:generate
+bun run db:migrate
+bun run db:seed
 ```
-
-To run:
-
-```bash
-bun run index.ts
-```
-
-This project was created using `bun init` in bun v1.2.5. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.

@@ -1,0 +1,35 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dpin-frontend
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: dpin-frontend
+  template:
+    metadata:
+      labels:
+        app: dpin-frontend
+    spec:
+      containers:
+        - name: frontend
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NEXT_PUBLIC_API_URL
+              value: {{ .Values.env.NEXT_PUBLIC_API_URL | quote }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dpin-frontend
+spec:
+  type: {{ .Values.service.type }}
+  selector:
+    app: dpin-frontend
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: 3000

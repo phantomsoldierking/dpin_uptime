@@ -1,0 +1,84 @@
+name: dpin
+include:
+  - docker-compose.infra.yml
+
+services:
+  api:
+    image: oven/bun:1.2
+    working_dir: /app
+    command: ["bun", "run", "dev:api"]
+    volumes:
+      - ./:/app
+    environment:
+      DATABASE_URL: postgresql://dpin:dpin_secret@postgres:5432/dpin?schema=public
+      PORT: 3001
+      JWT_SECRET: local-dev-jwt-secret-minimum-64-chars-padpadpadpadpadpadpadpadpad
+      CORS_ORIGIN: http://localhost:3000
+    ports:
+      - "3001:3001"
+    depends_on:
+      - postgres
+      - redis
+
+  hub:
+    image: oven/bun:1.2
+    working_dir: /app
+    command: ["bun", "run", "dev:hub"]
+    volumes:
+      - ./:/app
+    environment:
+      DATABASE_URL: postgresql://dpin:dpin_secret@postgres:5432/dpin?schema=public
+    depends_on:
+      - api
+
+  frontend:
+    image: oven/bun:1.2
+    working_dir: /app
+    command: ["bun", "run", "dev:frontend"]
+    volumes:
+      - ./:/app
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:3001/v1
+    ports:
+      - "3000:3000"
+    depends_on:
+      - api
+
+  validator-us-east:
+    build:
+      context: ./apps/validator-go
+      dockerfile: Dockerfile
+    environment:
+      HUB_API_URL: http://api:3001/v1
+      NODE_ID: validator-us-east-dev
+      NODE_REGION: us-east-1
+      NODE_API_KEY: 578da30cdbacda0c410640ddde37490771f13bff08384de37d15c886303135e9
+      NODE_HMAC_SECRET: dev-secret-us-east-1234567890
+    depends_on:
+      - api
+
+  validator-eu-west:
+    build:
+      context: ./apps/validator-go
+      dockerfile: Dockerfile
+    environment:
+      HUB_API_URL: http://api:3001/v1
+      NODE_ID: validator-eu-west-dev
+      NODE_REGION: eu-west-1
+      NODE_API_KEY: e2e63f950e1751ce68ca8a14c61e52903d77c0bf294a2bafc5af8892466512ca
+      NODE_HMAC_SECRET: dev-secret-eu-west-1234567890
+    depends_on:
+      - api
+
+  validator-ap-south:
+    build:
+      context: ./apps/validator-go
+      dockerfile: Dockerfile
+    environment:
+      HUB_API_URL: http://api:3001/v1
+      NODE_ID: validator-ap-south-dev
+      NODE_REGION: ap-south-1
+      NODE_API_KEY: 1c15770878866b9a7213cd51d8a1be919e54e2919af9e80b9dee9db53163bdff
+      NODE_HMAC_SECRET: dev-secret-ap-south-1234567890
+    depends_on:
+      - api

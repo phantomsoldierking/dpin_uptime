@@ -1,0 +1,11 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/phantomsoldierking/dpin-hub
+  tag: latest
+  pullPolicy: IfNotPresent
+
+env:
+  NODE_ENV: production
+  SCHEDULER_INTERVAL_MS: "10000"
+  STALE_JOB_TIMEOUT_MS: "120000"
