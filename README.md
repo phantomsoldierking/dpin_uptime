@@ -10,6 +10,10 @@ Plan-driven implementation of a distributed uptime monitoring platform with:
 - Prisma/PostgreSQL data model (`packages/db`)
 - DevOps layer (`infra/*`, `config/*`, `docker-compose*.yml`)
 
+# Architecture
+<img width="2576" height="1416" alt="image" src="https://github.com/user-attachments/assets/b269171a-b369-4529-a5da-1495ad66e81e" />
+
+
 ## Implemented platform features
 
 - Auth: `POST /v1/auth/register`, `POST /v1/auth/login`, `POST /v1/auth/refresh`, `GET /v1/auth/me`
