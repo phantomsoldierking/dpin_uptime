@@ -32,9 +32,9 @@ services:
       - api
 
   frontend:
-    image: oven/bun:1.2
+    image: node:20-bookworm-slim
     working_dir: /app
-    command: ["bun", "run", "dev:frontend"]
+    command: ["sh", "-lc", "cd apps/frontend && npm run dev"]
     volumes:
       - ./:/app
     environment:

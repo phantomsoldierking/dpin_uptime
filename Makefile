@@ -1,4 +1,4 @@
-.PHONY: help dev dev-api dev-hub dev-validator dev-frontend db-generate db-migrate db-seed test-e2e test-signing
+.PHONY: help dev dev-api dev-hub dev-validator dev-frontend db-generate db-migrate db-seed test-e2e test-signing test-local down-local
 
 help:
 	@echo "make dev            # run all apps via turbo"
@@ -12,6 +12,8 @@ help:
 	@echo "make db-seed        # seed local data"
 	@echo "make test-e2e       # run end-to-end check flow"
 	@echo "make test-signing   # run HMAC signing verification"
+	@echo "make test-local     # start local stack and validate core workflows"
+	@echo "make down-local     # stop local stack"
 	@echo "make infra-plan-dev # terraform plan (dev)"
 	@echo "make infra-plan-prod # terraform plan (prod)"
 
@@ -47,6 +49,12 @@ test-e2e:
 
 test-signing:
 	bash scripts/test-node-signing.sh
+
+test-local:
+	bash scripts/local-stack-test.sh
+
+down-local:
+	bash scripts/local-stack-down.sh
 
 infra-plan-dev:
 	bun run infra:plan:dev

@@ -680,29 +680,6 @@ v1.get("/jobs", authMiddleware, requireRoles("ADMIN", "SUPER"), async (req, res)
   res.json({ jobs });
 });
 
-v1.get("/jobs/:jobId", authMiddleware, requireRoles("ADMIN", "SUPER"), async (req, res) => {
-  const job = await prismaClient.job.findUnique({
-    where: { id: req.params.jobId },
-    include: {
-      website: true,
-      results: {
-        include: {
-          node: {
-            select: { id: true, region: true, name: true },
-          },
-        },
-      },
-    },
-  });
-
-  if (!job) {
-    res.status(404).json({ error: "Job not found" });
-    return;
-  }
-
-  res.json({ job });
-});
-
 v1.get("/jobs/poll", nodeAuthMiddleware, async (req, res) => {
   const node = req.nodeAuth!;
   const now = new Date();
@@ -804,6 +781,29 @@ v1.get("/jobs/poll", nodeAuthMiddleware, async (req, res) => {
       assignedNodeIds: selected.assignedNodeIds,
     },
   });
+});
+
+v1.get("/jobs/:jobId", authMiddleware, requireRoles("ADMIN", "SUPER"), async (req, res) => {
+  const job = await prismaClient.job.findUnique({
+    where: { id: req.params.jobId },
+    include: {
+      website: true,
+      results: {
+        include: {
+          node: {
+            select: { id: true, region: true, name: true },
+          },
+        },
+      },
+    },
+  });
+
+  if (!job) {
+    res.status(404).json({ error: "Job not found" });
+    return;
+  }
+
+  res.json({ job });
 });
 
 v1.post("/results", async (req, res) => {

@@ -1,0 +1,668 @@
+Successfully tagged dpin-validator-us-east:latest
+Successfully tagged dpin-validator-ap-south:latest
+Successfully tagged dpin-validator-eu-west:latest
+[+] up 9/9
+ ✔ Image dpin-validator-us-east        Built                                               0.2s 
+ ✔ Image dpin-validator-ap-south       Built                                               0.2s 
+ ✔ Image dpin-validator-eu-west        Built                                               0.3s 
+ ✔ Container dpin-redis                Running                                             0.0s 
+ ✔ Container dpin-postgres             Running                                             0.0s 
+ ✔ Container dpin-api-1                Running                                             0.0s 
+ ✔ Container dpin-validator-ap-south-1 Running                                             0.0s 
+ ✔ Container dpin-validator-eu-west-1  Running                                             0.0s 
+ ✔ Container dpin-validator-us-east-1  Running                                             0.0s 
+[step] Creating a monitored website
+[ok] Website created: cmmjkd4xt000imn09stjyynd9
+[step] Waiting for scheduler and Go validators to process jobs
+[step] Verifying node activity
+[ok] Nodes endpoint shows active validators
+[step] Verifying results for created website
+[error] local stack test failed
+
+[debug] docker compose status
+NAME                        IMAGE                                          COMMAND                  SERVICE              CREATED         STATUS         PORTS
+dpin-api-1                  oven/bun:1.2                                   "/usr/local/bin/dock…"   api                  3 minutes ago   Up 3 minutes   0.0.0.0:3001->3001/tcp, [::]:3001->3001/tcp
+dpin-frontend-1             node:20-bookworm-slim                          "docker-entrypoint.s…"   frontend             3 minutes ago   Up 3 minutes   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp
+dpin-grafana                grafana/grafana:11.3.0                         "/run.sh"                grafana              3 minutes ago   Up 3 minutes   0.0.0.0:3030->3000/tcp, [::]:3030->3000/tcp
+dpin-hub-1                  oven/bun:1.2                                   "/usr/local/bin/dock…"   hub                  3 minutes ago   Up 3 minutes   
+dpin-loki                   grafana/loki:3.2.0                             "/usr/bin/loki -conf…"   loki                 3 minutes ago   Up 3 minutes   0.0.0.0:3100->3100/tcp, [::]:3100->3100/tcp
+dpin-otel                   otel/opentelemetry-collector-contrib:0.111.0   "/otelcol-contrib --…"   otel-collector       3 minutes ago   Up 3 minutes   4317/tcp, 55678-55679/tcp, 0.0.0.0:4318->4318/tcp, [::]:4318->4318/tcp
+dpin-postgres               postgres:16                                    "docker-entrypoint.s…"   postgres             3 minutes ago   Up 3 minutes   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp
+dpin-prometheus             prom/prometheus:v2.54.1                        "/bin/prometheus --c…"   prometheus           3 minutes ago   Up 3 minutes   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp
+dpin-promtail               grafana/promtail:3.2.0                         "/usr/bin/promtail -…"   promtail             3 minutes ago   Up 3 minutes   
+dpin-redis                  redis:7-alpine                                 "docker-entrypoint.s…"   redis                3 minutes ago   Up 3 minutes   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp
+dpin-tempo                  grafana/tempo:2.6.0                            "/tempo -config.file…"   tempo                3 minutes ago   Up 3 minutes   0.0.0.0:3200->3200/tcp, [::]:3200->3200/tcp, 0.0.0.0:4317->4317/tcp, [::]:4317->4317/tcp
+dpin-validator-ap-south-1   dpin-validator-ap-south                        "/validator"             validator-ap-south   3 minutes ago   Up 3 minutes   
+dpin-validator-eu-west-1    dpin-validator-eu-west                         "/validator"             validator-eu-west    3 minutes ago   Up 3 minutes   
+dpin-validator-us-east-1    dpin-validator-us-east                         "/validator"             validator-us-east    3 minutes ago   Up 3 minutes   
+
+[debug] recent service logs
+api-1  | $ bun run --cwd apps/api dev
+api-1  | $ bun run index.ts
+api-1  | dpin-api listening on port 3001
+api-1  | health: http://localhost:3001/health
+api-1  | metrics: http://localhost:3001/metrics
+dpin-otel  | 2026-03-09T19:14:57.818Z   info    service@v0.111.0/service.go:136 Setting up own telemetry...
+validator-ap-south-1  | 2026/03/09 19:15:32 validator-go starting node=validator-ap-south-dev region=ap-south-1 hub=http://api:3001/v1
+api-1                 | prisma:warn Prisma failed to detect the libssl/openssl version to use, and may not work as expected. Defaulting to "openssl-1.1.x".
+validator-ap-south-1  | 2026/03/09 19:15:37 poll failed: poll failed: status=401
+api-1                 | Please manually install OpenSSL via `apt-get update -y && apt-get install -y openssl` and try installing Prisma again. If you're running Prisma on Docker, add this command to your Dockerfile, or switch to an image that already has OpenSSL installed.
+validator-us-east-1   | 2026/03/09 19:15:32 validator-go starting node=validator-us-east-dev region=us-east-1 hub=http://api:3001/v1
+validator-ap-south-1  | 2026/03/09 19:15:42 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:15:37 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:15:47 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:15:42 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:15:52 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:15:47 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:15:57 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:15:52 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:02 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:15:57 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:07 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:02 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:12 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:07 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:15:32 validator-go starting node=validator-eu-west-dev region=eu-west-1 hub=http://api:3001/v1
+validator-eu-west-1   | 2026/03/09 19:15:37 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:15:42 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:15:47 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:15:52 poll failed: poll failed: status=401
+dpin-otel             | 2026-03-09T19:14:57.819Z        info    telemetry/metrics.go:70 Serving metrics {"address": "localhost:8888", "metrics level": "Normal"}
+dpin-otel             | 2026-03-09T19:14:57.819Z        info    builders/builders.go:26 Deprecated component. Will be removed in future releases.       {"kind": "exporter", "data_type": "logs", "name": "loki"}
+dpin-otel             | 2026-03-09T19:14:57.819Z        info    lokiexporter@v0.111.0/exporter.go:43    using the new Loki exporter     {"kind": "exporter", "data_type": "logs", "name": "loki"}
+dpin-otel             | 2026-03-09T19:14:57.820Z        info    service@v0.111.0/service.go:208Starting otelcol-contrib...      {"Version": "0.111.0", "NumCPU": 12}
+validator-us-east-1   | 2026/03/09 19:16:12 poll failed: poll failed: status=401
+hub-1                 | $ bun run --cwd apps/hub dev
+validator-us-east-1   | 2026/03/09 19:16:17 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:22 poll failed: poll failed: status=401
+hub-1                 | $ bun run index.ts
+hub-1                 | [hub] scheduler starting (tick=10000ms)
+validator-eu-west-1   | 2026/03/09 19:15:57 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:02 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:07 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:12 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:17 poll failed: poll failed: status=401
+dpin-otel             | 2026-03-09T19:14:57.820Z        info    extensions/extensions.go:39    Starting extensions...
+dpin-otel             | 2026-03-09T19:14:57.821Z        warn    internal@v0.111.0/warning.go:40Using the 0.0.0.0 address exposes this server to every network interface, which may facilitate Denial of Service attacks.        {"kind": "exporter", "data_type": "metrics", "name": "prometheus", "documentation": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/security-best-practices.md#safeguards-against-denial-of-service-attacks"}
+dpin-otel             | 2026-03-09T19:14:57.821Z        warn    internal@v0.111.0/warning.go:40Using the 0.0.0.0 address exposes this server to every network interface, which may facilitate Denial of Service attacks.        {"kind": "receiver", "name": "otlp", "data_type": "metrics", "documentation": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/security-best-practices.md#safeguards-against-denial-of-service-attacks"}
+dpin-otel             | 2026-03-09T19:14:57.821Z        info    otlpreceiver@v0.111.0/otlp.go:112       Starting GRPC server    {"kind": "receiver", "name": "otlp", "data_type": "metrics", "endpoint": "0.0.0.0:4317"}
+dpin-otel             | 2026-03-09T19:14:57.821Z        warn    internal@v0.111.0/warning.go:40Using the 0.0.0.0 address exposes this server to every network interface, which may facilitate Denial of Service attacks.        {"kind": "receiver", "name": "otlp", "data_type": "metrics", "documentation": "https://github.com/open-telemetry/opentelemetry-collector/blob/main/docs/security-best-practices.md#safeguards-against-denial-of-service-attacks"}
+dpin-otel             | 2026-03-09T19:14:57.821Z        info    otlpreceiver@v0.111.0/otlp.go:169       Starting HTTP server    {"kind": "receiver", "name": "otlp", "data_type": "metrics", "endpoint": "0.0.0.0:4318"}
+dpin-otel             | 2026-03-09T19:14:57.821Z        info    service@v0.111.0/service.go:234Everything is ready. Begin running and processing data.
+validator-eu-west-1   | 2026/03/09 19:16:22 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:27 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:27 poll failed: poll failed: status=401
+hub-1                 | prisma:warn Prisma failed to detect the libssl/openssl version to use, and may not work as expected. Defaulting to "openssl-1.1.x".
+validator-us-east-1   | 2026/03/09 19:16:32 poll failed: poll failed: status=401
+hub-1                 | Please manually install OpenSSL via `apt-get update -y && apt-get install -y openssl` and try installing Prisma again. If you're running Prisma on Docker, add this command to your Dockerfile, or switch to an image that already has OpenSSL installed.
+frontend-1            |     status: 1,
+frontend-1            |     signal: null,
+frontend-1            |     output: [
+frontend-1            |       null,
+frontend-1            |       <Buffer >,
+validator-eu-west-1   | 2026/03/09 19:16:32 poll failed: poll failed: status=401
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+validator-eu-west-1   | 2026/03/09 19:16:37 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:42 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:47 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:52 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:16:57 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:17 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:22 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:27 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:32 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:37 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:42 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:47 poll failed: poll failed: status=401
+hub-1                 | [hub] scheduled website=example-slow regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] queue snapshot pending=15 assigned=0 inProgress=0 completed=3
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+validator-us-east-1   | 2026/03/09 19:16:37 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:42 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:47 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:52 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:16:57 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:02 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:07 poll failed: poll failed: status=401
+frontend-1            |       <Buffer 65 72 72 6f 72 20 54 68 69 73 20 70 72 6f 6a 65 63 74 27 73 20 70 61 63 6b 61 67 65 2e 6a 73 6f 6e 20 64 65 66 69 6e 65 73 20 22 70 61 63 6b 61 67 65 ... 424 more bytes>
+validator-eu-west-1   | 2026/03/09 19:17:02 poll failed: poll failed: status=401
+frontend-1            |     ],
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+validator-ap-south-1  | 2026/03/09 19:16:52 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:16:57 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:02 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:07 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:12 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:17 poll failed: poll failed: status=401
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+validator-ap-south-1  | 2026/03/09 19:17:22 poll failed: poll failed: status=401
+hub-1                 | [hub] queue snapshot pending=30 assigned=0 inProgress=0 completed=3
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-slow regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+validator-us-east-1   | 2026/03/09 19:17:12 poll failed: poll failed: status=401
+hub-1                 | [hub] queue snapshot pending=48 assigned=0 inProgress=0 completed=3
+validator-us-east-1   | 2026/03/09 19:17:17 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:22 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:27 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:32 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:37 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:42 poll failed: poll failed: status=401
+frontend-1            |     pid: 64,
+validator-eu-west-1   | 2026/03/09 19:17:07 poll failed: poll failed: status=401
+frontend-1            |     stdout: <Buffer >,
+validator-ap-south-1  | 2026/03/09 19:17:27 poll failed: poll failed: status=401
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+validator-ap-south-1  | 2026/03/09 19:17:32 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:37 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:42 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:47 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:52 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:17:57 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:18:02 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:47 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:12 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:52 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:17 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:17:57 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:02 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:07 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:12 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:17 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:22 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:18:07 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:27 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:32 poll failed: poll failed: status=401
+validator-us-east-1   | 2026/03/09 19:18:37 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:18:12 poll failed: poll failed: status=401
+frontend-1            |     stderr: <Buffer 65 72 72 6f 72 20 54 68 69 73 20 70 72 6f 6a 65 63 74 27 73 20 70 61 63 6b 61 67 65 2e 6a 73 6f 6e 20 64 65 66 69 6e 65 73 20 22 70 61 63 6b 61 67 65 ... 424 more bytes>
+frontend-1            |   }
+frontend-1            | }
+frontend-1            |  ⚠ Found lockfile missing swc dependencies, patching...
+frontend-1            | error This project's package.json defines "packageManager": "yarn@bun@1.2.5". However the current global version of Yarn is 1.22.22.
+frontend-1            | 
+frontend-1            | Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
+validator-eu-west-1   | 2026/03/09 19:17:22 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:27 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:32 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:37 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:42 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:47 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:52 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:17:57 poll failed: poll failed: status=401
+frontend-1            | Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+frontend-1            | error This project's package.json defines "packageManager": "yarn@bun@1.2.5". However the current global version of Yarn is 1.22.22.
+frontend-1            | 
+frontend-1            | Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
+frontend-1            | Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+frontend-1            | error This project's package.json defines "packageManager": "yarn@bun@1.2.5". However the current global version of Yarn is 1.22.22.
+frontend-1            | 
+frontend-1            | Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
+frontend-1            | Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+frontend-1            | error This project's package.json defines "packageManager": "yarn@bun@1.2.5". However the current global version of Yarn is 1.22.22.
+frontend-1            | 
+frontend-1            | Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
+validator-eu-west-1   | 2026/03/09 19:18:02 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:18:07 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:18:12 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:18:17 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:18:22 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:18:27 poll failed: poll failed: status=401
+frontend-1            | Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+frontend-1            | error This project's package.json defines "packageManager": "yarn@bun@1.2.5". However the current global version of Yarn is 1.22.22.
+frontend-1            | 
+frontend-1            | Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
+frontend-1            | Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+frontend-1            | error This project's package.json defines "packageManager": "yarn@bun@1.2.5". However the current global version of Yarn is 1.22.22.
+frontend-1            | 
+frontend-1            | Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
+validator-ap-south-1  | 2026/03/09 19:18:17 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:18:22 poll failed: poll failed: status=401
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] queue snapshot pending=63 assigned=0 inProgress=0 completed=3
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-slow regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+validator-eu-west-1   | 2026/03/09 19:18:32 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:18:27 poll failed: poll failed: status=401
+validator-eu-west-1   | 2026/03/09 19:18:37 poll failed: poll failed: status=401
+hub-1                 | [hub] timed out 9 stale jobs
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] timed out 3 stale jobs
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] timed out 3 stale jobs
+hub-1                 | [hub] queue snapshot pending=66 assigned=0 inProgress=0 completed=3
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+validator-ap-south-1  | 2026/03/09 19:18:32 poll failed: poll failed: status=401
+validator-ap-south-1  | 2026/03/09 19:18:37 poll failed: poll failed: status=401
+frontend-1            | Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-f64d7e regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] timed out 9 stale jobs
+frontend-1            |  ⨯ Failed to patch lockfile, please try uninstalling and reinstalling next in this workspace
+frontend-1            | Error: Failed to get registry from "yarn".
+frontend-1            |     at Array.map (<anonymous>) {
+frontend-1            |   [cause]: Error: Command failed: yarn config get registry 
+frontend-1            |   error This project's package.json defines "packageManager": "yarn@bun@1.2.5". However the current global version of Yarn is 1.22.22.
+frontend-1            |   
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-slow regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-95cca7 regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-95cca7 regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] queue snapshot pending=15 assigned=0 inProgress=0 completed=3
+hub-1                 | [hub] scheduled website=local-stack-test-site-95cca7 regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-http regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=example-down regions=us-east-1,eu-west-1,ap-south-1
+hub-1                 | [hub] scheduled website=local-stack-test-site-95cca7 regions=us-east-1,eu-west-1,ap-south-1
+frontend-1            |   Presence of the "packageManager" field indicates that the project is meant to be used with Corepack, a tool included by default with all official Node.js distributions starting from 16.9 and 14.19.
+frontend-1            |   Corepack must currently be enabled by running corepack enable in your terminal. For more information, check out https://yarnpkg.com/corepack.
+frontend-1            |   
+frontend-1            |       at Array.map (<anonymous>) {
+frontend-1            |     status: 1,
+frontend-1            |     signal: null,
+frontend-1            |     output: [
+frontend-1            |       null,
+frontend-1            |       <Buffer >,
+frontend-1            |       <Buffer 65 72 72 6f 72 20 54 68 69 73 20 70 72 6f 6a 65 63 74 27 73 20 70 61 63 6b 61 67 65 2e 6a 73 6f 6e 20 64 65 66 69 6e 65 73 20 22 70 61 63 6b 61 67 65 ... 424 more bytes>
+frontend-1            |     ],
+frontend-1            |     pid: 303,
+frontend-1            |     stdout: <Buffer >,
+frontend-1            |     stderr: <Buffer 65 72 72 6f 72 20 54 68 69 73 20 70 72 6f 6a 65 63 74 27 73 20 70 61 63 6b 61 67 65 2e 6a 73 6f 6e 20 64 65 66 69 6e 65 73 20 22 70 61 63 6b 61 67 65 ... 424 more bytes>
+frontend-1            |   }
+frontend-1            | }
+frontend-1            |    ▲ Next.js 15.2.3 (Turbopack)
+frontend-1            |    - Local:        http://localhost:3000
+frontend-1            |    - Network:      http://0.0.0.0:3000
+frontend-1            | 
+frontend-1            |  ✓ Starting...
+frontend-1            | Attention: Next.js now collects completely anonymous telemetry regarding usage.
+frontend-1            | This information is used to shape Next.js' roadmap and prioritize features.
+frontend-1            | You can learn more, including how to opt-out if you'd not like to participate in this anonymous program, by visiting the following URL:
+frontend-1            | https://nextjs.org/telemetry
+frontend-1            | 
+frontend-1            |  ✓ Ready in 2.4s
+frontend-1            |  ○ Compiling /login ...
+frontend-1            |  ✓ Compiled /login in 1818ms
+frontend-1            |  GET /login 200 in 2063ms
+frontend-1            |  GET /login 200 in 46ms
+frontend-1            |  ○ Compiling /register ...
+frontend-1            |  ✓ Compiled /register in 621ms
+frontend-1            |  GET /register 200 in 664ms
+frontend-1            |  GET /login 200 in 61ms
+frontend-1            |  GET /login 200 in 50ms
+frontend-1            |  GET /register 200 in 39ms
+make: *** [Makefile:54: test-local] Error 1
+󰣇 phantom/projects/dpin_uptime   main  !?⇣1 ❯ docker ps                              00:48 
+CONTAINER ID   IMAGE                                          COMMAND                  CREATED         STATUS         PORTS                                                                                      NAMES
+d4099d588049   dpin-validator-eu-west                         "/validator"             3 minutes ago   Up 3 minutes                                                                                              dpin-validator-eu-west-1
+eb1f0ca3fd6f   dpin-validator-us-east                         "/validator"             3 minutes ago   Up 3 minutes                                                                                              dpin-validator-us-east-1
+fe36daf6402d   dpin-validator-ap-south                        "/validator"             3 minutes ago   Up 3 minutes                                                                                              dpin-validator-ap-south-1
+3dbf79d07e92   node:20-bookworm-slim                          "docker-entrypoint.s…"   3 minutes ago   Up 3 minutes   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp                                                dpin-frontend-1
+8fa08f4b85c3   oven/bun:1.2                                   "/usr/local/bin/dock…"   3 minutes ago   Up 3 minutes                                                                                              dpin-hub-1
+54100685a7ee   oven/bun:1.2                                   "/usr/local/bin/dock…"   3 minutes ago   Up 3 minutes   0.0.0.0:3001->3001/tcp, [::]:3001->3001/tcp                                                dpin-api-1
+f8ba0460f435   postgres:16                                    "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes   0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp                                                dpin-postgres
+08af9c40cb68   redis:7-alpine                                 "docker-entrypoint.s…"   4 minutes ago   Up 4 minutes   0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp                                                dpin-redis
+4e582ad1933d   grafana/loki:3.2.0                             "/usr/bin/loki -conf…"   4 minutes ago   Up 4 minutes   0.0.0.0:3100->3100/tcp, [::]:3100->3100/tcp                                                dpin-loki
+4b351d143de4   prom/prometheus:v2.54.1                        "/bin/prometheus --c…"   4 minutes ago   Up 4 minutes   0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp                                                dpin-prometheus
+dbefa7897144   grafana/grafana:11.3.0                         "/run.sh"                4 minutes ago   Up 4 minutes   0.0.0.0:3030->3000/tcp, [::]:3030->3000/tcp                                                dpin-grafana
+b9418376141d   otel/opentelemetry-collector-contrib:0.111.0   "/otelcol-contrib --…"   4 minutes ago   Up 4 minutes   4317/tcp, 55678-55679/tcp, 0.0.0.0:4318->4318/tcp, [::]:4318->4318/tcp                     dpin-otel
+efa3cc322a4c   grafana/tempo:2.6.0                            "/tempo -config.file…"   4 minutes ago   Up 4 minutes   0.0.0.0:3200->3200/tcp, [::]:3200->3200/tcp, 0.0.0.0:4317->4317/tcp, [::]:4317->4317/tcp   dpin-tempo
+d91e5c77d4b0   grafana/promtail:3.2.0                         "/usr/bin/promtail -…"   4 minutes ago   Up 4 minutes                                                                                              dpin-promtail
+󰣇 phantom/projects/dpin_uptime   main  !?⇣1 ❯ make test-local                        00:48 
+
+bash scripts/local-stack-test.sh
+[step] Checking Bun dependencies
+[step] Starting infra services
+WARN[0000] No services to build                         
+[+] up 8/8
+ ✔ Container dpin-prometheus Running                                                       0.0s 
+ ✔ Container dpin-loki       Running                                                       0.0s 
+ ✔ Container dpin-grafana    Running                                                       0.0s 
+ ✔ Container dpin-promtail   Running                                                       0.0s 
+ ✔ Container dpin-redis      Running                                                       0.0s 
+ ✔ Container dpin-otel       Running                                                       0.0s 
+ ✔ Container dpin-postgres   Running                                                       0.0s 
+ ✔ Container dpin-tempo      Running                                                       0.0s 
+[ok] Prometheus is reachable at http://localhost:9090/-/ready
+[ok] Grafana is reachable at http://localhost:3030/api/health
+[step] Using DATABASE_URL=postgresql://dpin:dpin_secret@localhost:5432/dpin?schema=public
+[step] Generating Prisma client
+$ bun run --cwd packages/db db:generate
+$ prisma generate --schema=prisma/schema.prisma
+Prisma schema loaded from prisma/schema.prisma
+
+✔ Generated Prisma Client (v6.5.0) to ./../../node_modules/@prisma/client in 140ms
+
+Start by importing your Prisma Client (See: https://pris.ly/d/importing-client)
+
+Tip: Want to react to database changes in your app as they happen? Discover how with Pulse: https://pris.ly/tip-1-pulse
+
+[step] Running database migrations
+$ bun run --cwd packages/db db:migrate
+$ prisma migrate dev --schema=prisma/schema.prisma
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": PostgreSQL database "dpin", schema "public" at "localhost:5432"
+
+Already in sync, no schema change or pending migration was found.
+
+✔ Generated Prisma Client (v6.5.0) to ./../../node_modules/@prisma/client in 139ms
+
+
+[step] Seeding local data
+$ bun run --cwd packages/db db:seed
+$ bun run prisma/seed.ts
+Seed complete
+Admin: admin@dpin-local.io / admin123
+Node:  node@dpin-local.io / node123
+Node API keys:
+  validator-us-east-dev: 578da30cdbacda0c410640ddde37490771f13bff08384de37d15c886303135e9
+  validator-eu-west-dev: e2e63f950e1751ce68ca8a14c61e52903d77c0bf294a2bafc5af8892466512ca
+  validator-ap-south-dev: 1c15770878866b9a7213cd51d8a1be919e54e2919af9e80b9dee9db53163bdff
+[step] Starting application services
+WARN[0000] No services to build                         
+[+] up 5/5
+ ✔ Container dpin-redis      Running                                                       0.0s 
+ ✔ Container dpin-postgres   Running                                                       0.0s 
+ ✔ Container dpin-api-1      Created                                                       0.0s 
+ ✔ Container dpin-hub-1      Created                                                       0.1s 
+ ✔ Container dpin-frontend-1 Created                                                       0.1s 
+[ok] API is reachable at http://localhost:3001/health
+[ok] Frontend is reachable at http://localhost:3000/login
+[step] Verifying frontend routes
+[ok] Frontend login/register routes render
+[step] Logging in through API
+[ok] Auth login succeeded
+[step] Verifying authenticated UX/API flow
+[ok] Authenticated overview endpoint works
+[step] Registering local validator nodes
+[ok] Validator nodes registered
+[step] Starting validator services
+WARN[0000] Docker Compose requires buildx plugin to be installed 
+Sending build context to Docker daemon  4.051kB
+Sending build context to Docker daemon  4.051kB
+Sending build context to Docker daemon  4.051kB
+Step 1/12 : FROM golang:1.23-alpine AS builder
+Step 1/12 : FROM golang:1.23-alpine AS builder
+Step 1/12 : FROM golang:1.23-alpine AS builder
+ ---> 383395b794df
+Step 2/12 : WORKDIR /app
+ ---> 383395b794df
+Step 2/12 : WORKDIR /app
+ ---> 383395b794df
+Step 2/12 : WORKDIR /app
+ ---> Using cache
+ ---> 2fc31765f5d2
+Step 3/12 : COPY go.mod ./
+ ---> Using cache
+ ---> 2fc31765f5d2
+Step 3/12 : COPY go.mod ./
+ ---> Using cache
+ ---> 2fc31765f5d2
+Step 3/12 : COPY go.mod ./
+ ---> Using cache
+ ---> 69eaad5e3c73
+Step 4/12 : COPY cmd ./cmd
+ ---> Using cache
+ ---> 69eaad5e3c73
+Step 4/12 : COPY cmd ./cmd
+ ---> Using cache
+ ---> 69eaad5e3c73
+Step 4/12 : COPY cmd ./cmd
+ ---> Using cache
+ ---> 25f0e38b7a87
+Step 5/12 : COPY internal ./internal
+ ---> Using cache
+ ---> 25f0e38b7a87
+Step 5/12 : COPY internal ./internal
+ ---> Using cache
+ ---> 25f0e38b7a87
+Step 5/12 : COPY internal ./internal
+ ---> Using cache
+ ---> e906f5cdf34c
+Step 6/12 : RUN go build -o /bin/validator ./cmd/validator
+ ---> Using cache
+ ---> e906f5cdf34c
+Step 6/12 : RUN go build -o /bin/validator ./cmd/validator
+ ---> Using cache
+ ---> e906f5cdf34c
+Step 6/12 : RUN go build -o /bin/validator ./cmd/validator
+ ---> Using cache
+ ---> b0c58a8f4140
+Step 7/12 : FROM alpine:3.20
+ ---> Using cache
+ ---> b0c58a8f4140
+Step 7/12 : FROM alpine:3.20
+ ---> Using cache
+ ---> b0c58a8f4140
+Step 7/12 : FROM alpine:3.20
+ ---> a4f4213abb84
+Step 8/12 : RUN adduser -D -g '' appuser
+ ---> a4f4213abb84
+Step 8/12 : RUN adduser -D -g '' appuser
+ ---> a4f4213abb84
+Step 8/12 : RUN adduser -D -g '' appuser
+ ---> Using cache
+ ---> 3aa6e8927c0b
+Step 9/12 : USER appuser
+ ---> Using cache
+ ---> 3aa6e8927c0b
+Step 9/12 : USER appuser
+ ---> Using cache
+ ---> 3aa6e8927c0b
+Step 9/12 : USER appuser
+ ---> Using cache
+ ---> 5984bdc41ecd
+Step 10/12 : COPY --from=builder /bin/validator /validator
+ ---> Using cache
+ ---> 5984bdc41ecd
+Step 10/12 : COPY --from=builder /bin/validator /validator
+ ---> Using cache
+ ---> 5984bdc41ecd
+Step 10/12 : COPY --from=builder /bin/validator /validator
+ ---> Using cache
+ ---> Using cache
+ ---> Using cache
+ ---> d34ca686fb4d
+Step 11/12 : ENTRYPOINT ["/validator"]
+ ---> d34ca686fb4d
+Step 11/12 : ENTRYPOINT ["/validator"]
+ ---> d34ca686fb4d
+Step 11/12 : ENTRYPOINT ["/validator"]
+ ---> Using cache
+ ---> 1c9c857478e5
+Step 12/12 : LABEL com.docker.compose.image.builder=classic
+ ---> Using cache
+ ---> 1c9c857478e5
+Step 12/12 : LABEL com.docker.compose.image.builder=classic
+ ---> Using cache
+ ---> 1c9c857478e5
+Step 12/12 : LABEL com.docker.compose.image.builder=classic
+ ---> Using cache
+ ---> 33e202ad1e9d
+ ---> Using cache
+ ---> 33e202ad1e9d
+ ---> Using cache
+ ---> 33e202ad1e9d
+Successfully built 33e202ad1e9d
+Successfully built 33e202ad1e9d
+Successfully built 33e202ad1e9d
+Successfully tagged dpin-validator-eu-west:latest
+Successfully tagged dpin-validator-us-east:latest
+Successfully tagged dpin-validator-ap-south:latest
+[+] up 9/9
+ ✔ Image dpin-validator-eu-west        Built                                               0.3s 
+ ✔ Image dpin-validator-ap-south       Built                                               0.3s 
+ ✔ Image dpin-validator-us-east        Built                                               0.3s 
+ ✔ Container dpin-redis                Running                                             0.0s 
+ ✔ Container dpin-postgres             Running                                             0.0s 
+ ✔ Container dpin-api-1                Running                                             0.0s 
+ ✔ Container dpin-validator-ap-south-1 Created                                             0.1s 
+ ✔ Container dpin-validator-eu-west-1  Created                                             0.1s 
+ ✔ Container dpin-validator-us-east-1  Created                                             0.1s 
+[step] Creating a monitored website
+[ok] Website created: cmmjkh5m70007le090op5wcqh
+[step] Waiting for scheduler and Go validators to process jobs
+[step] Verifying node activity
+[ok] Nodes endpoint shows active validators
+[step] Verifying results for created website
+[ok] Result ingestion path works
+[step] Verifying analytics for created website
+[ok] Website analytics endpoint works
+[step] Verifying Prometheus metrics exposure
+[ok] API metrics are exposed
+[step] Running HMAC signing verification test
+1) Submit invalid signature (expect 401)
+   ✅ invalid signature rejected
+2) Submit valid signature (expect 201)
+   ✅ valid signature accepted
+✅ Signing test complete
+[step] Running API-level end-to-end test
+1) Login
+2) Create website
+   websiteId=cmmjkhwz2001wle098v3hah97
+3) Wait for scheduler + validator
+4) Fetch results
+{
+  "results": [
+    {
+      "id": "cmmjkic4a002jle09wtduwpxn",
+      "jobId": "cmmjki24q001tmn09rmocc5dh",
+      "nodeId": "validator-ap-south-dev",
+      "websiteId": "cmmjkhwz2001wle098v3hah97",
+      "region": "ap-south-1",
+      "status": "DOWN",
+      "statusCode": null,
+      "responseTimeMs": 76,
+      "dnsTimeMs": null,
+      "tcpTimeMs": null,
+      "tlsTimeMs": null,
+      "ttfbMs": null,
+      "errorMessage": "Get \"https://httpstat.us/200\": dial tcp 127.0.0.1:443: connect: connection refused",
+      "signature": "9bf238044b0ec3cfda10c2fe48bcd39756feda9a23b75fca896f326384f82aee",
+      "isConsensus": true,
+      "timestamp": "2026-03-09T19:22:06.678Z",
+      "createdAt": "2026-03-09T19:22:06.682Z",
+      "node": {
+        "id": "validator-ap-south-dev",
+        "region": "ap-south-1",
+        "name": "validator-ap-south-dev"
+      }
+    },
+    {
+      "id": "cmmjkic4a002lle095hg1k19o",
+      "jobId": "cmmjki24o001rmn096o76pc13",
+      "nodeId": "validator-eu-west-dev",
+      "websiteId": "cmmjkhwz2001wle098v3hah97",
+      "region": "eu-west-1",
+      "status": "DOWN",
+      "statusCode": null,
+      "responseTimeMs": 76,
+      "dnsTimeMs": null,
+      "tcpTimeMs": null,
+      "tlsTimeMs": null,
+      "ttfbMs": null,
+      "errorMessage": "Get \"https://httpstat.us/200\": dial tcp 127.0.0.1:443: connect: connection refused",
+      "signature": "fefdc0bd7aba4156fd0dda080c3f65b733e977340e02b12a657eb080be909674",
+      "isConsensus": true,
+      "timestamp": "2026-03-09T19:22:06.678Z",
+      "createdAt": "2026-03-09T19:22:06.683Z",
+      "node": {
+        "id": "validator-eu-west-dev",
+        "region": "eu-west-1",
+        "name": "validator-eu-west-dev"
+      }
+    },
+    {
+      "id": "cmmjki8bw002fle09m46gu5mr",
+      "jobId": "cmmjki24n001pmn09gj4scbun",
+      "nodeId": "validator-us-east-dev",
+      "websiteId": "cmmjkhwz2001wle098v3hah97",
+      "region": "us-east-1",
+      "status": "DOWN",
+      "statusCode": null,
+      "responseTimeMs": 164,
+      "dnsTimeMs": null,
+      "tcpTimeMs": null,
+      "tlsTimeMs": null,
+      "ttfbMs": null,
+      "errorMessage": "Get \"https://httpstat.us/200\": dial tcp 127.0.0.1:443: connect: connection refused",
+      "signature": "232f44c61d1f368b065bbbee036f47795433cdccfdd089b828bf4dd8d0d24c07",
+      "isConsensus": true,
+      "timestamp": "2026-03-09T19:22:01.763Z",
+      "createdAt": "2026-03-09T19:22:01.772Z",
+      "node": {
+        "id": "validator-us-east-dev",
+        "region": "us-east-1",
+        "name": "validator-us-east-dev"
+      }
+    }
+  ]
+}
+5) Fetch analytics summary
+{
+  "totalChecks": 3,
+  "successfulChecks": 0,
+  "failedChecks": 3,
+  "uptimePercent": 0,
+  "avgResponseMs": 105.33
+}
+✅ E2E check flow complete
+[done] Local stack validated
+URLs:
+  Frontend:   http://localhost:3000
+  API:        http://localhost:3001
+  Grafana:    http://localhost:3030
+  Prometheus: http://localhost:9090
+
+Notes:
+  /infra contains production deployment definitions (Terraform, Helm, K8s).
+  /config contains observability/runtime config files used by docker-compose and monitoring services.
+󰣇 phantom/projects/dpin_uptime   main  !?⇣1 ❯ docker ps                              00:52 
+CONTAINER ID   IMAGE                                          COMMAND                  CREATED              STATUS              PORTS                                                                                      NAMES
+7d836b2b2fdc   dpin-validator-ap-south                        "/validator"             About a minute ago   Up About a minute                                                                                              dpin-validator-ap-south-1
+5dcbbda8323f   dpin-validator-us-east                         "/validator"             About a minute ago   Up About a minute                                                                                              dpin-validator-us-east-1
+2c87fd88c0e0   dpin-validator-eu-west                         "/validator"             About a minute ago   Up About a minute                                                                                              dpin-validator-eu-west-1
+721ca9c82052   node:20-bookworm-slim                          "docker-entrypoint.s…"   About a minute ago   Up About a minute   0.0.0.0:3000->3000/tcp, [::]:3000->3000/tcp                                                dpin-frontend-1
+655311b09ef4   oven/bun:1.2                                   "/usr/local/bin/dock…"   About a minute ago   Up About a minute                                                                                              dpin-hub-1
+29c1915c6830   oven/bun:1.2                                   "/usr/local/bin/dock…"   About a minute ago   Up About a minute   0.0.0.0:3001->3001/tcp, [::]:3001->3001/tcp                                                dpin-api-1
+f8ba0460f435   postgres:16                                    "docker-entrypoint.s…"   7 minutes ago        Up 7 minutes        0.0.0.0:5432->5432/tcp, [::]:5432->5432/tcp                                                dpin-postgres
+08af9c40cb68   redis:7-alpine                                 "docker-entrypoint.s…"   7 minutes ago        Up 7 minutes        0.0.0.0:6379->6379/tcp, [::]:6379->6379/tcp                                                dpin-redis
+4e582ad1933d   grafana/loki:3.2.0                             "/usr/bin/loki -conf…"   7 minutes ago        Up 7 minutes        0.0.0.0:3100->3100/tcp, [::]:3100->3100/tcp                                                dpin-loki
+4b351d143de4   prom/prometheus:v2.54.1                        "/bin/prometheus --c…"   7 minutes ago        Up 7 minutes        0.0.0.0:9090->9090/tcp, [::]:9090->9090/tcp                                                dpin-prometheus
+dbefa7897144   grafana/grafana:11.3.0                         "/run.sh"                7 minutes ago        Up 7 minutes        0.0.0.0:3030->3000/tcp, [::]:3030->3000/tcp                                                dpin-grafana
+b9418376141d   otel/opentelemetry-collector-contrib:0.111.0   "/otelcol-contrib --…"   7 minutes ago        Up 7 minutes        4317/tcp, 55678-55679/tcp, 0.0.0.0:4318->4318/tcp, [::]:4318->4318/tcp                     dpin-otel
+efa3cc322a4c   grafana/tempo:2.6.0                            "/tempo -config.file…"   7 minutes ago        Up 7 minutes        0.0.0.0:3200->3200/tcp, [::]:3200->3200/tcp, 0.0.0.0:4317->4317/tcp, [::]:4317->4317/tcp   dpin-tempo
+d91e5c77d4b0   grafana/promtail:3.2.0                         "/usr/bin/promtail -…"   7 minutes ago        Up 7 minutes                                                                                                   dpin-promtail
+󰣇 phantom/projects/dpin_uptime   main  !?⇣1 ❯ make down-local                        00:52 
+
+bash scripts/local-stack-down.sh
+[+] down 15/15
+ ✔ Container dpin-validator-us-east-1  Removed                                             0.2s 
+ ✔ Container dpin-prometheus           Removed                                             0.3s 
+ ✔ Container dpin-hub-1                Removed                                             0.4s 
+ ✔ Container dpin-validator-eu-west-1  Removed                                             0.3s 
+ ✔ Container dpin-grafana              Removed                                             0.3s 
+ ✔ Container dpin-loki                 Removed                                             2.1s 
+ ✔ Container dpin-promtail             Removed                                             0.3s 
+ ✔ Container dpin-validator-ap-south-1 Removed                                             0.3s 
+ ✔ Container dpin-frontend-1           Removed                                            10.2s 
+ ✔ Container dpin-otel                 Removed                                             0.3s 
+ ✔ Container dpin-tempo                Removed                                             2.1s 
+ ✔ Container dpin-api-1                Removed                                             0.3s 
+ ✔ Container dpin-postgres             Removed                                             0.1s 
+ ✔ Container dpin-redis                Removed                                             0.2s 
+ ✔ Network dpin_default                Removed                                             0.1s 
+󰣇 phantom/projects/dpin_uptime   main  !?⇣1 ❯                                        00:52 

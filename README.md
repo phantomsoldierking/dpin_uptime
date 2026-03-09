@@ -114,6 +114,7 @@ bun run dev:validator:go
 ```bash
 bash scripts/test-check-flow.sh
 bash scripts/test-node-signing.sh
+bash scripts/local-stack-test.sh
 ```
 
 ## Notes
@@ -122,3 +123,5 @@ bash scripts/test-node-signing.sh
 - Validator polls jobs, runs checks, signs results, and submits them.
 - API computes quorum-style majority consensus and opens/closes incidents from alert configs.
 - SLA records are computed by hub and available to frontend through `/v1/analytics/sla`.
+- `/infra` is only for production-style deployment and provisioning: Terraform, Helm, and Kubernetes manifests. You do not need it to understand or run the app locally.
+- `/config` contains runtime configuration for local observability services such as Prometheus, Grafana, Loki, Tempo, OTel, and Promtail. It matters only when you use the Docker monitoring stack.
